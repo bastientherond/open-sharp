@@ -5,8 +5,6 @@ pub mod invalid_item_view;
 pub mod item;
 mod modal_layer;
 mod multi_workspace;
-#[cfg(test)]
-mod multi_workspace_tests;
 pub mod notifications;
 pub mod pane;
 pub mod pane_group;
@@ -41,7 +39,6 @@ pub use path_list::{PathList, SerializedPathList};
 pub use remote::RemoteConnectionIdentity;
 pub use toast_layer::{ToastAction, ToastLayer, ToastView};
 
-use agent_settings::AgentSettings;
 use anyhow::{Context as _, Result, anyhow};
 use client::{
     ChannelId, Client, ErrorExt, ParticipantIndex, Status, TypedEnvelope, User, UserStore,
@@ -11498,14 +11495,7 @@ pub fn open_paths(
                 if let Some(window) = creation_window {
                     window
                         .update(cx, |multi_workspace, _, cx| {
-                            if AgentSettings::get_global(cx).threads_sidebar.auto_open {
-                                multi_workspace.open_sidebar(cx);
-                            } else {
-                                // Opening the sidebar is also what pins the
-                                // workspace we are about to navigate away from,
-                                // so pin it here to keep it in this window.
-                                multi_workspace.retain_active_workspace(cx);
-                            }
+                            multi_workspace.retain_active_workspace(cx);
                         })
                         .log_err();
                 }
